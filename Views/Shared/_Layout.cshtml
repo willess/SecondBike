@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @* Adding bootstrap from node modules *@
+    <link href="~/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/node_modules/font-awesome/css/font-awesome.css" rel="stylesheet" />
+
+    @* Adding own css stylesheets *@
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <header class="container-fluid">
+        <nav class="navbar navbar-expand-md">
+            <a class="navbar-brand" asp-controller="App" asp-action="Index">SecondBike</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="App" asp-action="About">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Register</a>
+                    </li>
+                    <form class="form-inline">
+                        <button class="btn btn-success" type="button">Plaats advertentie</button>
+                    </form>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">@ViewBag.Title</h1>
+            @*<p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>*@
+        </div>
+    </div>
+
+    <section class="container-fluid">
+        @RenderBody()
+    </section>
+
+    <div class="container-fluid">
+        <footer class="text-center">Copyright 2020 SecondBike.nl</footer>
+    </div>
+
+    @* Adding javascript files from node modules *@
+    <script src="~/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="~/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    @* Adding own javascript files *@
+
+    @* Create a rendersection for scripts to load specific javascript files on specific pages *@
+    @RenderSection("scripts", false)
+</body>
+</html>

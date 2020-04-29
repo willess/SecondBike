@@ -1,0 +1,19 @@
+﻿body {
+    background-color: white;
+}
+
+.container-fluid {
+    max-width: 1600px;
+}
+
+nav {
+    background-color: white;
+    color: black;
+}
+
+nav .navbar-brand {
+    color: black;
+}
+
+nav a {
+}
