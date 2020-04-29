@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SecondBike.Data;
 using SecondBike.Data.Entities;
+using SecondBike.ViewModels;
 
 namespace SecondBike.Controllers
 {
@@ -16,11 +18,13 @@ namespace SecondBike.Controllers
     {
         private readonly ISecondBikeRepository _repository;
         private readonly ILogger<AdvertisementsController> _logger;
+        private readonly IMapper _mapper;
 
-        public AdvertisementsController(ISecondBikeRepository repository, ILogger<AdvertisementsController> logger)
+        public AdvertisementsController(ISecondBikeRepository repository, ILogger<AdvertisementsController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -30,7 +34,7 @@ namespace SecondBike.Controllers
         {
             try
             {
-                return Ok(_repository.GetAllAdvertisements());
+                return Ok(_mapper.Map<IEnumerable<Advertisement>, IEnumerable<AdvertisementViewModel>>(_repository.GetAllAdvertisements()));
             }
             catch (Exception ex)
             {
@@ -49,7 +53,7 @@ namespace SecondBike.Controllers
 
                 if(advertisement != null)
                 {
-                    return Ok(advertisement);
+                    return Ok(_mapper.Map<Advertisement, AdvertisementViewModel>(advertisement));
                 } 
                 else
                 {
@@ -61,6 +65,42 @@ namespace SecondBike.Controllers
                 _logger.LogError($"Failed to load Advertisement: {ex}");
                 return BadRequest($"Failed to load Advertisement");
             }
+        }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] AdvertisementViewModel model)
+        {
+            //add to database
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    var newAdvertisement = _mapper.Map<AdvertisementViewModel, Advertisement>(model);
+
+                    _repository.AddEntity(newAdvertisement);
+                    if (_repository.SaveAll())
+                    {
+                        return Created($"/api/advertisements/{newAdvertisement.AdvertisementId}", _mapper.Map<Advertisement, AdvertisementViewModel>(newAdvertisement));
+                    }
+                    else
+                    {
+                        return BadRequest("could not save!!");
+                    }
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to save a new advertisement: {ex}");
+            }
+
+            return BadRequest("Failed to save new advertisement");
+
         }
     }
 }

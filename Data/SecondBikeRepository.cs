@@ -21,19 +21,11 @@ namespace SecondBike.Data
 
         public IEnumerable<Advertisement> GetAllAdvertisements()
         {
-            try
-            {
-                return _ctx.Advertisements
-                        .Include(c => c.Category)
-                            .ThenInclude(m => m.MainCategory)
-                        .ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to get all products: {ex}");
-                return null;
-            }
-
+            return _ctx.Advertisements
+                    .Include(c => c.Category)
+                        .ThenInclude(m => m.MainCategory)
+                        .ThenInclude(c => c.Categories)
+                    .ToList();
         }
 
         public Advertisement GetAdvertisementById(int id)
@@ -41,7 +33,8 @@ namespace SecondBike.Data
             return _ctx.Advertisements
                     .Include(c => c.Category)
                         .ThenInclude(m => m.MainCategory)
-                    .Where(a => a.AdvertisementId == id)
+                        .ThenInclude(c => c.Categories)
+                        .Where(a => a.AdvertisementId == id)
                     .FirstOrDefault();
         }
 
@@ -68,6 +61,9 @@ namespace SecondBike.Data
             return _ctx.SaveChanges() > 0;
         }
 
-
+        public void AddEntity(object model)
+        {
+            _ctx.Add(model);
+        }
     }
 }
