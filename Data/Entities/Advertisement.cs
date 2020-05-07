@@ -14,5 +14,8 @@ namespace SecondBike.Data.Entities
         // subcategory
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+
+        // User
+        public User User { get; set; }
     }
 }

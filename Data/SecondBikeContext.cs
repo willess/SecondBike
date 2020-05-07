@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SecondBike.Data.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SecondBike.Data
 {
-    public class SecondBikeContext : DbContext
+    public class SecondBikeContext : IdentityDbContext<User>
     {
         public SecondBikeContext(DbContextOptions<SecondBikeContext> options) : base(options)
         {

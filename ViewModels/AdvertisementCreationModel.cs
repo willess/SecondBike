@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace SecondBike.ViewModels
 {
-    public class AdvertisementViewModel
+    public class AdvertisementCreationModel
     {
-        public int AdvertisementId { get; set; }
+        [Required]
         public string Title { get; set; }
         public string Description { get; set; }
-        public CategoryViewModel Category { get; set; }
-
+        [Required]
+        public int CategoryId { get; set; }
     }
 }

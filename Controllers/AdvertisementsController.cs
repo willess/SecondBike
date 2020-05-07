@@ -2,105 +2,159 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SecondBike.Data;
 using SecondBike.Data.Entities;
-using SecondBike.ViewModels;
 
 namespace SecondBike.Controllers
 {
-    [Route("api/[Controller]")]
-    [ApiController]
-    [Produces("application/json")]
     public class AdvertisementsController : Controller
     {
-        private readonly ISecondBikeRepository _repository;
-        private readonly ILogger<AdvertisementsController> _logger;
-        private readonly IMapper _mapper;
+        private readonly SecondBikeContext _context;
 
-        public AdvertisementsController(ISecondBikeRepository repository, ILogger<AdvertisementsController> logger, IMapper mapper)
+        public AdvertisementsController(SecondBikeContext context)
         {
-            _repository = repository;
-            _logger = logger;
-            _mapper = mapper;
+            _context = context;
         }
 
-        [HttpGet]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        public ActionResult<IEnumerable<Advertisement>> Get()
+        // GET: Advertisements
+        public async Task<IActionResult> Index()
         {
-            try
-            {
-                return Ok(_mapper.Map<IEnumerable<Advertisement>, IEnumerable<AdvertisementViewModel>>(_repository.GetAllAdvertisements()));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Falied to get advertisements: {ex}");
-                return BadRequest("Falied to get advertisements");
-            }
-
+            var secondBikeContext = _context.Advertisements.Include(a => a.Category);
+            return View(await secondBikeContext.ToListAsync());
         }
 
-        [HttpGet("{id:int}")]
-        public IActionResult GetSingleAdvertisement(int id)
+        // GET: Advertisements/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
-            try
+            if (id == null)
             {
-                var advertisement = _repository.GetAdvertisementById(id);
+                return NotFound();
+            }
 
-                if(advertisement != null)
-                {
-                    return Ok(_mapper.Map<Advertisement, AdvertisementViewModel>(advertisement));
-                } 
-                else
-                {
-                    return NotFound();
-                }
-            }
-            catch(Exception ex)
+            var advertisement = await _context.Advertisements
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(m => m.AdvertisementId == id);
+            if (advertisement == null)
             {
-                _logger.LogError($"Failed to load Advertisement: {ex}");
-                return BadRequest($"Failed to load Advertisement");
+                return NotFound();
             }
+
+            return View(advertisement);
         }
 
+        // GET: Advertisements/Create
+        public IActionResult Create()
+        {
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
+            return View();
+        }
+
+        // POST: Advertisements/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        public IActionResult Post([FromBody] AdvertisementViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("AdvertisementId,Title,Description,CategoryId")] Advertisement advertisement)
         {
-            //add to database
-            try
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                _context.Add(advertisement);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
+            return View(advertisement);
+        }
+
+        // GET: Advertisements/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var advertisement = await _context.Advertisements.FindAsync(id);
+            if (advertisement == null)
+            {
+                return NotFound();
+            }
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
+            return View(advertisement);
+        }
+
+        // POST: Advertisements/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("AdvertisementId,Title,Description,CategoryId")] Advertisement advertisement)
+        {
+            if (id != advertisement.AdvertisementId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
                 {
-
-                    var newAdvertisement = _mapper.Map<AdvertisementViewModel, Advertisement>(model);
-
-                    _repository.AddEntity(newAdvertisement);
-                    if (_repository.SaveAll())
+                    _context.Update(advertisement);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!AdvertisementExists(advertisement.AdvertisementId))
                     {
-                        return Created($"/api/advertisements/{newAdvertisement.AdvertisementId}", _mapper.Map<Advertisement, AdvertisementViewModel>(newAdvertisement));
+                        return NotFound();
                     }
                     else
                     {
-                        return BadRequest("could not save!!");
+                        throw;
                     }
                 }
-                else
-                {
-                    return BadRequest(ModelState);
-                }
-
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
+            return View(advertisement);
+        }
+
+        // GET: Advertisements/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
             {
-                _logger.LogError($"Failed to save a new advertisement: {ex}");
+                return NotFound();
             }
 
-            return BadRequest("Failed to save new advertisement");
+            var advertisement = await _context.Advertisements
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(m => m.AdvertisementId == id);
+            if (advertisement == null)
+            {
+                return NotFound();
+            }
 
+            return View(advertisement);
+        }
+
+        // POST: Advertisements/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var advertisement = await _context.Advertisements.FindAsync(id);
+            _context.Advertisements.Remove(advertisement);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool AdvertisementExists(int id)
+        {
+            return _context.Advertisements.Any(e => e.AdvertisementId == id);
         }
     }
 }

@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using SecondBike.Data;
+using SecondBike.Data.Entities;
 
 namespace SecondBike
 {
@@ -30,6 +32,13 @@ namespace SecondBike
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //identity
+            services.AddIdentity<User, IdentityRole>(cfg =>
+            {
+                cfg.User.RequireUniqueEmail = true;
+            })
+                .AddEntityFrameworkStores<SecondBikeContext>();
 
             // adding context services
             services.AddDbContext<SecondBikeContext>(cfg => {
@@ -55,11 +64,13 @@ namespace SecondBike
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsEnvironment("Development"))
             {
                 app.UseDeveloperExceptionPage();
-            } else
+            }
+            else
             {
+                // add error page
                 app.UseExceptionHandler("/Error");
             }
 
@@ -70,6 +81,10 @@ namespace SecondBike
 
             // Routing
             app.UseRouting();
+
+            //Authorization
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -23,14 +23,33 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="App" asp-action="About">About</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Register</a>
-                    </li>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                My Account
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="nav-link" asp-controller="Account" asp-action="Profile">Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                        </li>
+                    }
+
                     <form class="form-inline">
-                        <button class="btn btn-success" type="button">Plaats advertentie</button>
+                        <button class="btn btn-success" type="button">Post new Ad</button>
                     </form>
                 </ul>
             </div>
@@ -59,6 +78,6 @@
     @* Adding own javascript files *@
 
     @* Create a rendersection for scripts to load specific javascript files on specific pages *@
-    @RenderSection("scripts", false)
+    @RenderSection("Scripts", false)
 </body>
 </html>

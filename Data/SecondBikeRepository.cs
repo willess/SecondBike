@@ -56,6 +56,12 @@ namespace SecondBike.Data
             return results;
         }
 
+        public Category GetCategory(int id)
+        {
+            var category = _ctx.Categories.Find(id);
+            return category;
+        }
+
         public bool SaveAll()
         {
             return _ctx.SaveChanges() > 0;

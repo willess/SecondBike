@@ -6,9 +6,9 @@
 }
 
 
-<h1>Alle Advertenties</h1>
+<h1>All Ads</h1>
 
-<p>Aantal: @Model.Count()</p>
+<p>Count: @Model.Count()</p>
 
 @if (Model.Count() > 0)
 {
@@ -21,7 +21,9 @@
                     <div class="card-body">
                         <h5 class="card-title">@a.Title</h5>
                         <p class="card-text">@a.Description.</p>
-                        <a href="#" class="btn btn-primary">Bekijk</a>
+                        <p><span class="small">Hoofdcategorie: @a.Category.MainCategory.Name</span></p>
+                        <p><span class="small">Subcategorie: @a.Category.Name</span></p>
+                        <a href="#" class="btn btn-primary">Check</a>
                     </div>
                 </div>
             </div>
@@ -30,5 +32,5 @@
 }
 else
 {
-    <p>Geen advertenties om te tonen...</p>
+    <p>No ads to show, place the very first ad!</p>
 }
