@@ -21,11 +21,13 @@ namespace SecondBike.Data
 
         public IEnumerable<Advertisement> GetAllAdvertisements()
         {
-            return _ctx.Advertisements
+            var ads = _ctx.Advertisements
                     .Include(c => c.Category)
                         .ThenInclude(m => m.MainCategory)
                         .ThenInclude(c => c.Categories)
                     .ToList();
+            ads.Reverse();
+            return ads;
         }
 
         public Advertisement GetAdvertisementById(int id)
@@ -33,8 +35,9 @@ namespace SecondBike.Data
             return _ctx.Advertisements
                     .Include(c => c.Category)
                         .ThenInclude(m => m.MainCategory)
-                        .ThenInclude(c => c.Categories)
-                        .Where(a => a.AdvertisementId == id)
+                            .ThenInclude(c => c.Categories)
+                    .Include(u => u.User)
+                    .Where(a => a.AdvertisementId == id)
                     .FirstOrDefault();
         }
 
@@ -45,6 +48,18 @@ namespace SecondBike.Data
                             .Include(c => c.Category)
                             .ToList();
                             
+            return results;
+        }
+
+        public IEnumerable<Advertisement> GetAdvertisementsByUser(User user)
+        {
+
+            var results = _ctx.Advertisements
+                            .Include(c => c.Category)
+                                .ThenInclude(m => m.MainCategory)
+                            .Where(u => u.User == user)
+                            .ToList();
+
             return results;
         }
 
@@ -70,6 +85,11 @@ namespace SecondBike.Data
         public void AddEntity(object model)
         {
             _ctx.Add(model);
+        }
+
+        public void UpdateEntity(object model)
+        {
+            _ctx.Update(model);
         }
     }
 }

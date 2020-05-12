@@ -1,5 +1,5 @@
 ﻿
-@model IEnumerable<Advertisement>
+@model IEnumerable<SecondBike.ViewModels.AdvertisementViewModel>
 
 @{
     ViewBag.Title = "Home Page";
@@ -21,9 +21,9 @@
                     <div class="card-body">
                         <h5 class="card-title">@a.Title</h5>
                         <p class="card-text">@a.Description.</p>
-                        <p><span class="small">Hoofdcategorie: @a.Category.MainCategory.Name</span></p>
-                        <p><span class="small">Subcategorie: @a.Category.Name</span></p>
-                        <a href="#" class="btn btn-primary">Check</a>
+                        @*<p><span class="small">Hoofdcategorie: @a.Category.MainCategory.Name</span></p>
+                        <p><span class="small">Subcategorie: @a.Category.Name</span></p>*@
+                        <a asp-controller="Advertisements" asp-action="Details" asp-route-id="@a.AdvertisementId" class="btn btn-primary">Check</a>
                     </div>
                 </div>
             </div>

@@ -20,6 +20,9 @@ namespace SecondBike.Data
 
             CreateMap<MainCategory, MainCategoryViewModel>()
                 .ReverseMap();
+
+            CreateMap<User, UserProfileViewModel>()
+                .ReverseMap();
         }
     }
 }

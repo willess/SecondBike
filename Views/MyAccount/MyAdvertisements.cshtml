@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Advertisement>
+
+@{
+    ViewData["Title"] = "My Ads";
+}
+
+    <div class="row">
+        @if (Model.Count() > 0)
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Title)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Description)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Category)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Category.CategoryId)
+                            </td>
+                            <td>
+                                <a asp-controller="Advertisements" asp-action="Edit" asp-route-id="@item.AdvertisementId">Edit</a> |
+                                <a asp-controller="Advertisements" asp-action="Details" asp-route-id="@item.AdvertisementId">Details</a> |
+                                <a asp-controller="Advertisements" asp-action="Delete" asp-route-id="@item.AdvertisementId">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        } else
+        {
+            <h3>You don't have any ads at the moment, <a asp-controller="Advertisements" asp-action="Create">Create one</a> and start selling!</h3>
+        }
+
+    </div>

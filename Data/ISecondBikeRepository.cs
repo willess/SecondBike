@@ -12,6 +12,8 @@ namespace SecondBike.Data
         IEnumerable<Advertisement> GetAdvertisementsByCategory();
         bool SaveAll();
         void AddEntity(object model);
+        void UpdateEntity(object model);
         Category GetCategory(int id);
+        IEnumerable<Advertisement> GetAdvertisementsByUser(User user);
     }
 }

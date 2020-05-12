@@ -40,6 +40,10 @@ namespace SecondBike
             })
                 .AddEntityFrameworkStores<SecondBikeContext>();
 
+            //services.AddAuthentication()
+            //    .AddCookie()
+            //    .AddJwtBearer();
+
             // adding context services
             services.AddDbContext<SecondBikeContext>(cfg => {
                 cfg.UseSqlServer(_config.GetConnectionString("SecondBikeConnectionString"));

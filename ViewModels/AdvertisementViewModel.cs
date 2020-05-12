@@ -12,7 +12,6 @@ namespace SecondBike.ViewModels
         public int AdvertisementId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public CategoryViewModel Category { get; set; }
 
     }
 }

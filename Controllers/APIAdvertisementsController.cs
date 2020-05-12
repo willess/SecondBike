@@ -51,16 +51,16 @@ namespace SecondBike.Controllers
             {
                 var advertisement = _repository.GetAdvertisementById(id);
 
-                if(advertisement != null)
+                if (advertisement != null)
                 {
                     return Ok(_mapper.Map<Advertisement, AdvertisementViewModel>(advertisement));
-                } 
+                }
                 else
                 {
                     return NotFound();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Failed to load Advertisement: {ex}");
                 return BadRequest($"Failed to load Advertisement");
@@ -73,10 +73,12 @@ namespace SecondBike.Controllers
 
             try
             {
-                if(ModelState.IsValid)
+                if (ModelState.IsValid)
                 {
+                    int.TryParse(model.CategoryId, out int categoryId);
+
                     // get category
-                    var category = _repository.GetCategory(model.CategoryId);
+                    var category = _repository.GetCategory(categoryId);
 
                     var advertisement = new Advertisement()
                     {
@@ -96,7 +98,7 @@ namespace SecondBike.Controllers
                     {
                         return BadRequest("Could not save for some reason");
                     }
-                } 
+                }
                 else
                 {
                     return BadRequest(ModelState);

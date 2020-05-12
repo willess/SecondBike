@@ -13,7 +13,7 @@
 </head>
 <body>
     <header class="container-fluid">
-        <nav class="navbar navbar-expand-md">
+        <nav class="navbar navbar-light navbar-expand-md">
             <a class="navbar-brand" asp-controller="App" asp-action="Index">SecondBike</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -32,7 +32,10 @@
                                 My Account
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="nav-link" asp-controller="Account" asp-action="Profile">Profile</a>
+                                <a class="nav-link" asp-controller="MyAccount" asp-action="Profile">Profile</a>
+                                <a class="nav-link" asp-controller="MyAccount" asp-action="MyAdvertisements">My Ads</a>
+                                <a class="nav-link" asp-controller="MyAccount" asp-action="MyFavorites">My Favorites</a>
+                                <a class="nav-link" asp-controller="MyAccount" asp-action="MyBids">My Bids</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="nav-link" asp-controller="Account" asp-action="Logout">Logout</a>
                             </div>
@@ -47,10 +50,10 @@
                             <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
                         </li>
                     }
+                <li>
+                    <a class="btn btn-success" asp-controller="Advertisements" asp-action="Create">Post new Ad</a>
+                </li>
 
-                    <form class="form-inline">
-                        <button class="btn btn-success" type="button">Post new Ad</button>
-                    </form>
                 </ul>
             </div>
         </nav>

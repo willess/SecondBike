@@ -2,28 +2,42 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 using SecondBike.Data;
 using SecondBike.Data.Entities;
+using SecondBike.ViewModels;
 
 namespace SecondBike.Controllers
 {
     public class AdvertisementsController : Controller
     {
         private readonly SecondBikeContext _context;
+        private readonly ISecondBikeRepository _repository;
+        private readonly UserManager<User> _userManager;
+        private readonly ILogger<AdvertisementsController> _logger;
 
-        public AdvertisementsController(SecondBikeContext context)
+        public AdvertisementsController(SecondBikeContext context,
+                ISecondBikeRepository repository, 
+                UserManager<User> userManager,
+                ILogger<AdvertisementsController> logger)
         {
             _context = context;
+            _repository = repository;
+            _userManager = userManager;
+            _logger = logger;
         }
 
         // GET: Advertisements
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var secondBikeContext = _context.Advertisements.Include(a => a.Category);
-            return View(await secondBikeContext.ToListAsync());
+            return RedirectToAction("Index", "App");
         }
 
         // GET: Advertisements/Details/5
@@ -46,9 +60,9 @@ namespace SecondBike.Controllers
         }
 
         // GET: Advertisements/Create
+        [Authorize]
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
             return View();
         }
 
@@ -57,33 +71,97 @@ namespace SecondBike.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AdvertisementId,Title,Description,CategoryId")] Advertisement advertisement)
+        [Authorize]
+        public async Task<IActionResult> Create(AdvertisementCreationModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(advertisement);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    int.TryParse(model.CategoryId, out int categoryId);
+
+                    //check category
+                    var category = _repository.GetCategory(categoryId);
+
+                    if(User.Identity.IsAuthenticated)
+                    {
+                        // get logged in user
+                        var user = await _userManager.GetUserAsync(User);
+
+                        // create new advertisement
+                        var advertisement = new Advertisement()
+                        {
+                            Title = model.Title,
+                            Description = model.Description,
+                            Category = category,
+                            User = user
+                        };
+
+                        // Add new advertisement
+                        _repository.AddEntity(advertisement);
+
+                        //save and redirect to created advertisement detail page
+                        if(_repository.SaveAll())
+                        {
+                            return RedirectToAction("Details", new { id = advertisement.AdvertisementId });
+                        }
+                    }
+                    else
+                    {
+                        // user is not logged in so return badrequest
+                        return BadRequest();
+                    }
+                }
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
-            return View(advertisement);
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to create a new advertisement: ", ex);
+            }
+
+            return View(model);
+
+            //if (ModelState.IsValid)
+            //{
+            //    _context.Add(advertisement);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            //}
+            //ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
+            //return View(advertisement);
         }
 
         // GET: Advertisements/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [Authorize]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                var advertisement = _repository.GetAdvertisementById(id);
+
+                if (advertisement == null)
+                {
+                    return NotFound();
+                }
+
+                //check if logged in user owns this specific advertisement
+                if (User.Identity.IsAuthenticated)
+                {
+                    var user = await _userManager.GetUserAsync(User);
+                    if (advertisement.User == user)
+                    {
+                        ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
+                        return View(advertisement);
+                    }
+                }
+
+                return RedirectToAction("Details", new { id = advertisement.AdvertisementId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("failed to load advertisement edit page", ex);
             }
 
-            var advertisement = await _context.Advertisements.FindAsync(id);
-            if (advertisement == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", advertisement.CategoryId);
-            return View(advertisement);
+            return BadRequest();
         }
 
         // POST: Advertisements/Edit/5
@@ -91,6 +169,7 @@ namespace SecondBike.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("AdvertisementId,Title,Description,CategoryId")] Advertisement advertisement)
         {
             if (id != advertisement.AdvertisementId)
@@ -123,6 +202,7 @@ namespace SecondBike.Controllers
         }
 
         // GET: Advertisements/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,6 +224,7 @@ namespace SecondBike.Controllers
         // POST: Advertisements/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var advertisement = await _context.Advertisements.FindAsync(id);

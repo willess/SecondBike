@@ -13,6 +13,6 @@ namespace SecondBike.ViewModels
         public string Title { get; set; }
         public string Description { get; set; }
         [Required]
-        public int CategoryId { get; set; }
+        public string CategoryId { get; set; }
     }
 }

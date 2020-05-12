@@ -1,42 +1,75 @@
-﻿@model SecondBike.Data.Entities.Advertisement
+﻿@model SecondBike.ViewModels.AdvertisementCreationModel
 
 @{
     ViewData["Title"] = "Create";
 }
+@section Scripts {
+    <script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+}
 
-<h1>Create</h1>
-
-<h4>Advertisement</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6 offset-md-3">
+        <h4>Creating new Advertisement</h4>
+        <hr />
+
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+                <span asp-validation-for="Title" class="text-warning"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Description" class="text-warning"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    @*<div class="form-group">
+                        <label asp-for="CategoryId" class="control-label">Main Category</label>
+                        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
+                            <option>Select a category</option>
+                            <option value="1">Fietsen</option>
+                            <option value="2">Onderdelen</option>
+                            <option value="3">Accessoires</option>
+                            <option value="4">Kleding</option>
+                            <option value="5">Overig</option>
+                        </select>
+                    </div>*@
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="CategoryId" class="control-label">Subcategory</label>
+                        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
+                            <option value="">Select a category</option>
+                            <option value="4">Stadsfietsen heren</option>
+                            <option value="5">Stadfietsen dames</option>
+                            <option value="6">Racefietsen</option>
+                            <option value="7">Mountainbike fietsen</option>
+                            <option value="8">Elektrische fietsen</option>
+
+                            <option value="17">Fietsframes</option>
+                            <option value="28">Verlichting en reflectoren</option>
+                            <option value="21">Versnellingen</option>
+
+                            <option value="32">Fietsnavigaties</option>
+                            <option value="36">Helmen</option>
+                            <option value="37">Brillen</option>
+
+                            <option value="39">Shirts heren</option>
+                            <option value="40">Shirts dames</option>
+                            <option value="43">Sokken</option>
+
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-warning"></span>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-success" />
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
